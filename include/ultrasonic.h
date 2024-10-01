@@ -9,3 +9,9 @@ void lp47k_serialMode();
 void pinSetup();
 void lp300k_echoMode();
 float read_voltage();
+
+/*struct DistanceData {
+    char imei [16];
+    unsigned int distance;
+    float batteryVoltage;
+};*/

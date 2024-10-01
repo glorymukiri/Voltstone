@@ -1,11 +1,14 @@
 #include <Arduino.h>
 #include "ultrasonic.h"
+#include <ArduinoJson.h>
+#include "mqtt.h"
+#include "GSM.h"
 
-#define RX 9
-#define TX 8
+#define RX 5
+#define TX 4
 
-#define echo 9
-#define trig 8
+#define echo 5
+#define trig 4
 
 // defines variables
 long dur;
@@ -13,10 +16,12 @@ int dist;
 
 UART u_sensor(TX, RX, 0, 0);
 
+
 unsigned int distance;
 float Vin;
-float  R3 = 10000.0;
-float  R2 = 1912.0;
+float R3 = 10000.0;
+float R2 = 1912.0;
+
 
 void pinSetup()
 {
@@ -24,7 +29,7 @@ void pinSetup()
     pinMode(echo, INPUT);  // Sets the echoPin as an INPUT
 }
 
-void lp300k_echoMode()
+/*void lp300k_echoMode()
 {
     // Clears the trigPin condition
     digitalWrite(trig, LOW); //
@@ -42,7 +47,7 @@ void lp300k_echoMode()
     Serial.print(dist);
     Serial.println(" cm"); // working  code for aj-sr04m
     // delay(1000);
-}
+}*/
 
 void ultras_baudrate()
 {
@@ -52,9 +57,10 @@ void ultras_baudrate()
 void trig_read()
 {
     u_sensor.write(0x01);
-    delay(50);
+     delay(500);
     if (u_sensor.available())
     {
+        //delay(100);
         lp47k_serialMode();
     }
 }
@@ -71,7 +77,7 @@ void zero_ohm_read()
 
 void lp47k_serialMode()
 {
-
+  //AJ-SRO4M
     byte startByte, h_data, l_data, sum = 0;
     byte buf[3];
 
@@ -83,29 +89,25 @@ void lp47k_serialMode()
         l_data = buf[1];
         sum = buf[2];
         distance = (h_data << 8) + l_data;
-       // distance = 465;
         if (((h_data + l_data) & 0xFF) != sum)
         {
-           Serial.println("Invalid result");
-            //Serial.println(distance);
+            Serial.println("Invalid result");
         }
         else
         {
             if (distance == 8355)
             {
-                 Serial.print("Sensor placed in wrong position");
-                 distance = 0;
-                //Serial.println(distance);
+                Serial.print("Sensor placed in wrong position");
+                distance = 0;
             }
             else if (distance <= 200)
             {
-                 Serial.print("Sensor can't read below this level");
+                Serial.print("Sensor can't read below this level");
                 distance = 200;
-                //Serial.println(distance);
             }
             else
             {
-                Serial.print("Distance [mm]: ");
+                Serial.print("Distance [mm]:");
                 Serial.println(distance);
             }
         }
@@ -114,10 +116,12 @@ void lp47k_serialMode()
         return;
 }
 
+
+
 float read_voltage()
 {
     uint16_t result = adc_read();
-    float voltage = result * 3.3f / (1 << 12); // 12-bit ADC 
-    Vin = voltage * (R3+R2)/ R2;
+    float voltage = result * 3.3f / (1 << 12); // 12-bit ADC
+    Vin = voltage * (R3 + R2) / R2;
     return Vin;
 }

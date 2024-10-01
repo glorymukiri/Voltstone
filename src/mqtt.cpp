@@ -3,19 +3,21 @@
 #include "mqtt.h"
 #include "GSM.h"
 #include "ultrasonic.h"
+#include "hardware/flash.h"
+#include "hardware/sync.h"
 
-//MQTT publish details
+// MQTT publish details
 const char *trackerData = "Reading";
 
 PubSubClient mqtt;
 
-
 bool mqttConnect()
 {
-    Serial.println(F("Connecting to Flespi account"));  //flespi account
+    Serial.println(F("Connecting to Flespi account")); // flespi account
 
     // Connect the client //clientID, username, password  //GsmClientName, EDIsxSu3lnnzigHLRIsiQlLex3Sg4lTzMpP9890jkcGtie2XMk5qtEuRvaXqjENV
-    bool status = mqtt.connect ("xyz", "", "");
+    bool status = mqtt.connect("Euro", "", "");
+    // bool status = mqtt.connect ("GsmClientName", "JqYu7h4CqvZLcRty4rpgcMBmosRa9RjebkNLNQbMhY4XgefL4lQlzFhjapjyg5ko", "");
     return status;
 }
 bool connectionStatus()
@@ -92,32 +94,33 @@ void mqttReconnect()
     }
 }
 
-
 void publish_msg()
 {
-  // NB:You cannot set QOS of published message. It is fixed at 0
-  char myn[128];
+    // NB:You cannot set QOS of published message. It is fixed at 0
+    char myn[128];
 
-  StaticJsonDocument<128> doc;
+    StaticJsonDocument<128> doc;
 
-  doc["ident"] = IMEI;
-  doc["Height"] = 465; //distance; // lat_info1;
-  doc["Batteryvoltage"] = Vin;
-  // doc["Lng"] = long_info1;
-  // doc["T"] = time_sat1;
+    doc["ident"] = IMEI;
+    doc["Height"] = distance; // lat_info1;
+    //doc["Batteryvoltage"] = Vin;
+    // doc["Lng"] = long_info1;
+    // doc["T"] = time_sat1;
 
-  serializeJson(doc, myn);
+    serializeJson(doc, myn);
 
-  size_t n = serializeJson(doc, myn);
+    size_t n = serializeJson(doc, myn);
 
-  if (checkServConn())
-  {
-    mqtt.publish(trackerData, myn, n);
-    Serial.println(F("published"));
-  }
-  else
-  {
-    readStateReturnCode();
-    Serial.println(F("Not published"));
-  }
+    if (checkServConn())
+    {
+        mqtt.publish(trackerData, myn, n);
+        Serial.println(F("published"));
+    }
+    else
+    {
+        readStateReturnCode();
+        Serial.println(F("Not published"));
+    }
 }
+
+

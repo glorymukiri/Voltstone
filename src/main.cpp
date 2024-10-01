@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 // #include <ArduinoJson.h>
 #include "GSM.h"
@@ -14,18 +15,23 @@
 #define TINY_GSM_USE_GPRS true
 
 uint32_t startMillis;
-unsigned long duration = 300000UL;
+uint32_t startProgram;
+unsigned long duration = 900000UL;
+unsigned long resetDuration = 3600000UL;
+
+// void (*resetFunc)(void) = 0;
 
 void setup()
 {
+
   Serial.println(F("Wait..."));
 
   adc_init();
   adc_gpio_init(ADC_PIN);
 
-  ultras_baudrate();
-
   // pinSetup();
+
+  ultras_baudrate();
 
   modemSetup();
 
@@ -40,20 +46,36 @@ void setup()
   connectGPRS();
 
   brokerSetup();
+
   startMillis = millis();
+  startProgram = millis();
+  //  counter since program started to start publishing data to mqtt
+
+  // Serial.println("Setup Done");
+
   // Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 }
+
 void loop()
 {
 
-  connectionStatus();
+  if (!connectionStatus())
+  {
+    readStateReturnCode();
+  }
 
-  //trig_read();
-  read_voltage();
+  // powerTest();
+  pinSetup();
+
+  trig_read();
+
+  // read_voltage();
+
+  // lp47k_serialMode();
 
   // lp300k_echoMode();
-  //Serial.println("Voltage: ");
-  //Serial.print(read_voltage());
+  // Serial.println("Voltage: ");
+  // Serial.print(read_voltage());
   // printf("Voltage %f",read_voltage());
 
   if (millis() - startMillis >= duration)
@@ -62,5 +84,12 @@ void loop()
     startMillis = millis();
   }
 
-  
+  if (millis() - startProgram >= resetDuration)
+  {
+    Serial.println("Resetting device");
+    modemPowerOff();
+    delay(3000);
+    // resetFunc();
+    NVIC_SystemReset();
+  }
 }

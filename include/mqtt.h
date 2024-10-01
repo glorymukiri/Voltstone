@@ -1,4 +1,6 @@
 // use this if a connection attempt fails to get more info about the failure
+extern const char* trackerData;
+
 enum clientstate_Code
 {
     MQTT_CONNECTION_TIMEOUT = -4,

@@ -15,6 +15,8 @@
         "memory": "cpp",
         "random": "cpp",
         "initializer_list": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "algorithm": "cpp",
+        "functional": "cpp"
     }
 }

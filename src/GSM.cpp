@@ -10,12 +10,11 @@
 #define GSM_PIN ""
 String IMEI;
 // MQTT setup details
-const char *broker = "mqtt.thingsboard.cloud";  //   mqtt.flespi.io  demo.thingsboard.io  mqtt.thingsboard.cloud
-
+const char *broker = "mqtt.thingsboard.cloud"; //   mqtt.flespi.io  demo.thingsboard.io
 
 UART Serial1(TX_PIN, RX_PIN, 0, 0);
 
-#define DUMP_AT_COMMANDS
+//#define DUMP_AT_COMMANDS
 
 #ifdef DUMP_AT_COMMANDS
 #include <StreamDebugger.h>
@@ -27,15 +26,25 @@ TinyGsm modem(Serial1);
 
 TinyGsmClient client(modem);
 
-void modemSetup(){
+void modemSetup()
+{
     // Set GSM module baud rate
-  Serial1.begin(9600);
-  delay(6000);
+    Serial1.begin(9600);
+    // delay(6000);
 
-  digitalWrite(1, LOW);
-  delay(2000);
-  digitalWrite(1, HIGH);
-  delay(1000);
+    digitalWrite(1, LOW);
+    delay(2000);
+    digitalWrite(1, HIGH);
+    delay(1000);
+}
+
+void modemPowerOff(){
+    modem.poweroff();   
+}
+
+void resetPico() {
+  void (*resetFunc)(void) = 0;
+  resetFunc();  // Calls the reset function pointer, triggering a reset
 }
 
 void checkTCPConn()
@@ -78,9 +87,13 @@ void checkGPRSConn()
             Serial.println(F("Resetting device..."));
             modem.poweroff();
             delay(5000);
+            /************addition************/
+            modemSetup();
+            modem.init();
             // resetFunc();
-            //  delay(10000);
-            //  return;
+            delay(5000);
+            return;
+            /************addition************/
         }
         else
         {
@@ -171,6 +184,7 @@ void connectGPRS()
     // GPRS connection parameters are usually set after network registration
     Serial.println(F("Connecting to mobile net... "));
     if (!modem.gprsConnect("sfctelematics"))
+    //if (!modem.gprsConnect("onomondo"))
     {
         Serial.println(F("Connect fail"));
         delay(10000);
@@ -184,7 +198,7 @@ void connectGPRS()
     }
 }
 
-//PubSubClient mqtt1;
+// PubSubClient mqtt1;
 
 void brokerSetup()
 {
@@ -201,4 +215,16 @@ void brokerSetup()
         Serial.println(F("MQTT connection unsuccessful"));
         readStateReturnCode();
     }
+}
+
+void powerTest()
+{
+    delay(5000);
+    modem.poweroff();
+    delay(5000);
+    /************addition************/
+    modemSetup();
+    modem.init();
+    // resetFunc();
+    delay(5000);
 }

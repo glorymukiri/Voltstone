@@ -14,6 +14,7 @@ extern String IMEI;
 #include <TinyGsmClient.h>
 
 void modemSetup();
+void modemPowerOff();
 void checkGPRSConn();
 void checkTCPConn();
 void modemRestart();
@@ -22,3 +23,5 @@ void checkPin();
 void checkNetworkReg();
 void brokerSetup();
 void connectGPRS();
+void powerTest();
+void resetPico();
