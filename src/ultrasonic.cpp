@@ -57,7 +57,7 @@ void ultras_baudrate()
 void trig_read()
 {
     u_sensor.write(0x01);
-     delay(500);
+     delay(50);
     if (u_sensor.available())
     {
         //delay(100);

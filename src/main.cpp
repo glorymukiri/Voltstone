@@ -29,7 +29,7 @@ void setup()
   adc_init();
   adc_gpio_init(ADC_PIN);
 
-  // pinSetup();
+  pinSetup();
 
   ultras_baudrate();
 
@@ -64,8 +64,8 @@ void loop()
     readStateReturnCode();
   }
 
-  // powerTest();
-  pinSetup();
+  //powerTest();
+  //pinSetup();
 
   trig_read();
 

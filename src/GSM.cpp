@@ -90,9 +90,17 @@ void checkGPRSConn()
             /************addition************/
             modemSetup();
             modem.init();
+    
+            checkNetworkReg();
+
+            connectGPRS();
+
+            brokerSetup();
+
             // resetFunc();
-            delay(5000);
+            //delay(5000);
             return;
+            
             /************addition************/
         }
         else
@@ -183,7 +191,7 @@ void connectGPRS()
 {
     // GPRS connection parameters are usually set after network registration
     Serial.println(F("Connecting to mobile net... "));
-    if (!modem.gprsConnect("sfctelematics"))
+    if (!modem.gprsConnect("sfctelematics"))  
     //if (!modem.gprsConnect("onomondo"))
     {
         Serial.println(F("Connect fail"));
